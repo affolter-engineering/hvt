@@ -56,7 +56,7 @@ struct Args {
     methods: Option<Vec<String>>,
 
     /// Path to a wordlist file (one HTTP method per line, # for comments)
-    #[arg(short, long, conflicts_with_all = ["all", "safe", "methods"])]
+    #[arg(short = 'w', long = "wordlist", conflicts_with_all = ["all", "safe", "methods"])]
     wordlist: Option<String>,
 
     /// Show only results with these status codes (comma-separated)
@@ -510,4 +510,111 @@ async fn main() -> anyhow::Result<()> {
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_status_text_known_codes() {
+        assert_eq!(status_text(200), "OK");
+        assert_eq!(status_text(201), "Created");
+        assert_eq!(status_text(204), "No Content");
+        assert_eq!(status_text(301), "Moved Permanently");
+        assert_eq!(status_text(302), "Found");
+        assert_eq!(status_text(304), "Not Modified");
+        assert_eq!(status_text(400), "Bad Request");
+        assert_eq!(status_text(401), "Unauthorized");
+        assert_eq!(status_text(403), "Forbidden");
+        assert_eq!(status_text(404), "Not Found");
+        assert_eq!(status_text(405), "Method Not Allowed");
+        assert_eq!(status_text(500), "Internal Server Error");
+        assert_eq!(status_text(503), "Service Unavailable");
+    }
+
+    #[test]
+    fn test_status_text_unknown_codes() {
+        assert_eq!(status_text(0), "");
+        assert_eq!(status_text(418), "");
+        assert_eq!(status_text(999), "");
+    }
+
+    #[test]
+    fn test_status_color_preserves_text() {
+        colored::control::set_override(false);
+        assert_eq!(status_color(200, "OK").to_string(), "OK");
+        assert_eq!(status_color(302, "Found").to_string(), "Found");
+        assert_eq!(status_color(404, "Not Found").to_string(), "Not Found");
+        assert_eq!(status_color(500, "Error").to_string(), "Error");
+        assert_eq!(status_color(0, "unknown").to_string(), "unknown");
+    }
+
+    #[test]
+    fn test_common_methods_contains_standard_verbs() {
+        for verb in &["GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"] {
+            assert!(COMMON_METHODS.contains(verb), "COMMON_METHODS missing {verb}");
+        }
+    }
+
+    #[test]
+    fn test_safe_methods_exact() {
+        assert_eq!(SAFE_METHODS.len(), 3);
+        assert!(SAFE_METHODS.contains(&"GET"));
+        assert!(SAFE_METHODS.contains(&"HEAD"));
+        assert!(SAFE_METHODS.contains(&"OPTIONS"));
+    }
+
+    #[test]
+    fn test_all_methods_is_superset_of_common() {
+        for method in COMMON_METHODS {
+            assert!(ALL_METHODS.contains(method), "ALL_METHODS missing {method}");
+        }
+    }
+
+    #[test]
+    fn test_method_result_error_state() {
+        let r = MethodResult {
+            method: "FUZZ".to_string(),
+            status: 0,
+            size: 0,
+            time_ms: 0,
+            allow_header: None,
+            error: Some("invalid method".to_string()),
+        };
+        assert!(r.error.is_some());
+        assert_eq!(r.status, 0);
+        assert_eq!(r.size, 0);
+    }
+
+    #[test]
+    fn test_method_result_success_state() {
+        let r = MethodResult {
+            method: "GET".to_string(),
+            status: 200,
+            size: 1024,
+            time_ms: 42,
+            allow_header: Some("GET, POST".to_string()),
+            error: None,
+        };
+        assert!(r.error.is_none());
+        assert_eq!(r.status, 200);
+        assert_eq!(r.size, 1024);
+        assert_eq!(r.allow_header.as_deref(), Some("GET, POST"));
+    }
+
+    #[test]
+    fn test_method_result_serializes_to_json() {
+        let r = MethodResult {
+            method: "POST".to_string(),
+            status: 201,
+            size: 50,
+            time_ms: 10,
+            allow_header: None,
+            error: None,
+        };
+        let json = serde_json::to_string(&r).expect("serialization failed");
+        assert!(json.contains("\"method\":\"POST\""));
+        assert!(json.contains("\"status\":201"));
+    }
 }

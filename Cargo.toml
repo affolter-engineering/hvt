@@ -1,0 +1,24 @@
+[package]
+name = "hvt"
+version = "0.2.0"
+edition = "2024"
+authors = ["Fabian Affolter <fabian@affolter-engineering.ch>"]
+description = "HTTP Verb Tampering security testing tool"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/affolter-engineering/hvt"
+keywords = ["http", "security", "web", "cli", "methods"]
+categories = ["command-line-utilities", "network-programming"]
+
+[[bin]]
+name = "hvt"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+colored = "2"
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "socks"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }

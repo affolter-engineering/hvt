@@ -41,6 +41,23 @@ nix run . -- -u https://example.com
 nix develop        # dev shell
 ```
 
+## Testing
+
+Run the unit tests inside the Nix dev shell (provides `gcc` required by the `ring` dependency):
+
+```sh
+nix develop
+cargo test
+```
+
+Or run them entirely through Nix without entering a shell:
+
+```sh
+nix flake check
+```
+
+`nix flake check` compiles the project with `gcc` available and executes `cargo test` in a sandboxed build environment.
+
 ## Usage
 
 ```sh

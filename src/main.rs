@@ -1,11 +1,16 @@
 use clap::Parser;
 use colored::*;
 use reqwest::{
-    header::{HeaderMap, HeaderName, HeaderValue, COOKIE, USER_AGENT},
     Client, Proxy,
+    header::{COOKIE, HeaderMap, HeaderName, HeaderValue, USER_AGENT},
 };
 use serde::{Deserialize, Serialize};
-use std::{fs, str::FromStr, sync::Arc, time::{Duration, Instant}};
+use std::{
+    fs,
+    str::FromStr,
+    sync::Arc,
+    time::{Duration, Instant},
+};
 use tokio::sync::Semaphore;
 
 const COMMON_METHODS: &[&str] = &[
@@ -13,19 +18,62 @@ const COMMON_METHODS: &[&str] = &[
 ];
 
 const ALL_METHODS: &[&str] = &[
-    "ACL", "ARBITRARY", "BASELINE-CONTROL", "BCOPY", "BDELETE", "BIND",
-    "BMOVE", "BPATCH", "BPROPFIND", "BPROPPATCH", "CHECKIN", "CHECKOUT",
-    "CONNECT", "COPY", "DELETE", "GET", "GETLIB", "GIBBERISH", "HEAD",
-    "INDEX", "LABEL", "LINK", "LOCK", "MERGE", "MKACTIVITY", "MKCOL",
-    "MKREDIRECTREF", "MKWORKSPACE", "MOVE", "NOTIFY", "OPTIONS", "ORDERPATCH",
-    "PATCH", "POLL", "POST", "PROPFIND", "PROPPATCH", "PURGE", "PUT",
-    "REBIND", "REPORT", "SEARCH", "SUBSCRIBE", "TRACE", "UNBIND", "UNCHECKOUT",
-    "UNLINK", "UNLOCK", "UNSUBSCRIBE", "UPDATE", "UPDATEREDIRECTREF",
-    "VERSION-CONTROL", "X-MS-ENUMATTS",
+    "ACL",
+    "ARBITRARY",
+    "BASELINE-CONTROL",
+    "BCOPY",
+    "BDELETE",
+    "BIND",
+    "BMOVE",
+    "BPATCH",
+    "BPROPFIND",
+    "BPROPPATCH",
+    "CHECKIN",
+    "CHECKOUT",
+    "CONNECT",
+    "COPY",
+    "DELETE",
+    "GET",
+    "GETLIB",
+    "GIBBERISH",
+    "HEAD",
+    "INDEX",
+    "LABEL",
+    "LINK",
+    "LOCK",
+    "MERGE",
+    "MKACTIVITY",
+    "MKCOL",
+    "MKREDIRECTREF",
+    "MKWORKSPACE",
+    "MOVE",
+    "NOTIFY",
+    "OPTIONS",
+    "ORDERPATCH",
+    "PATCH",
+    "POLL",
+    "POST",
+    "PROPFIND",
+    "PROPPATCH",
+    "PURGE",
+    "PUT",
+    "REBIND",
+    "REPORT",
+    "SEARCH",
+    "SUBSCRIBE",
+    "TRACE",
+    "UNBIND",
+    "UNCHECKOUT",
+    "UNLINK",
+    "UNLOCK",
+    "UNSUBSCRIBE",
+    "UPDATE",
+    "UPDATEREDIRECTREF",
+    "VERSION-CONTROL",
+    "X-MS-ENUMATTS",
 ];
 
 const SAFE_METHODS: &[&str] = &["GET", "HEAD", "OPTIONS"];
-
 
 #[derive(Parser, Debug)]
 #[command(
@@ -215,7 +263,12 @@ fn status_text(code: u16) -> &'static str {
 
 /// Print the results in a formatted table
 fn print_table(results: &[MethodResult]) {
-    let mw = results.iter().map(|r| r.method.len()).max().unwrap_or(6).max(6);
+    let mw = results
+        .iter()
+        .map(|r| r.method.len())
+        .max()
+        .unwrap_or(6)
+        .max(6);
     let sep = "─".repeat(mw + 50);
 
     println!(
@@ -374,11 +427,19 @@ async fn main() -> anyhow::Result<()> {
         println!("  Threads  : {}", args.threads.to_string().bold());
         println!(
             "  TLS      : {}",
-            if args.insecure { "skip verify".yellow() } else { "verify".green() }
+            if args.insecure {
+                "skip verify".yellow()
+            } else {
+                "verify".green()
+            }
         );
         println!(
             "  Redirects: {}",
-            if args.follow_redirects { "follow".cyan() } else { "off".normal() }
+            if args.follow_redirects {
+                "follow".cyan()
+            } else {
+                "off".normal()
+            }
         );
         println!();
     }
@@ -450,7 +511,12 @@ async fn main() -> anyhow::Result<()> {
         .enumerate()
         .map(|(i, m)| (m.as_str(), i))
         .collect();
-    results.sort_by_key(|r| method_order.get(r.method.as_str()).copied().unwrap_or(usize::MAX));
+    results.sort_by_key(|r| {
+        method_order
+            .get(r.method.as_str())
+            .copied()
+            .unwrap_or(usize::MAX)
+    });
 
     // Apply status-code filters
     let filtered: Vec<MethodResult> = results
@@ -553,7 +619,10 @@ mod tests {
     #[test]
     fn test_common_methods_contains_standard_verbs() {
         for verb in &["GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"] {
-            assert!(COMMON_METHODS.contains(verb), "COMMON_METHODS missing {verb}");
+            assert!(
+                COMMON_METHODS.contains(verb),
+                "COMMON_METHODS missing {verb}"
+            );
         }
     }
 

@@ -26,7 +26,7 @@ cargo build --release
 ./target/release/hvt --help
 ```
 
-### NixOS / nix-shell
+### NixOS/Nixpkgs/nix-shell
 
 ```sh
 nix-shell          # drops into a shell with cargo + gcc
@@ -39,6 +39,15 @@ cargo build --release
 nix build          # produces result/bin/hvt
 nix run . -- -u https://example.com
 nix develop        # dev shell
+```
+
+### Nixpkgs
+
+For Nix or NixOS users is a package available. Keep in mind that the latest releases might only
+be present in the ``unstable`` channel.
+
+```bash
+ $ nix-env -iA nixos.hvt
 ```
 
 ## Testing

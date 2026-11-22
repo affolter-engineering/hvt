@@ -27,7 +27,7 @@
         # nix build - produce the binary
         packages.default = pkgs.rustPlatform.buildRustPackage {
           pname = "hvt";
-          version = "0.2.0";
+          version = "0.2.1";
           src = ./.;
           cargoLock.lockFile = ./Cargo.lock;
           nativeBuildInputs = with pkgs; [ gcc pkg-config ];
@@ -42,7 +42,7 @@
         # nix flake check - build and run cargo test
         checks.default = pkgs.rustPlatform.buildRustPackage {
           pname = "hvt";
-          version = "0.2.0";
+          version = "0.2.1";
           src = ./.;
           cargoLock.lockFile = ./Cargo.lock;
           nativeBuildInputs = with pkgs; [ gcc pkg-config ];

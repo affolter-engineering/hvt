@@ -1,6 +1,7 @@
 # hvt
 
-Too to do HTTP Verb Tampering. It probes HTTP methods against a target URL to uncover misconfigurations, bypasses and unintended method exposure.
+Too to do HTTP Verb Tampering. It probes HTTP methods against a target URL
+to uncover misconfigurations, bypasses and unintended method exposure.
 
 If `hvt` doesn't suite your need, check those:
 
@@ -11,7 +12,10 @@ If `hvt` doesn't suite your need, check those:
 
 ## What it does
 
-Some web servers and proxies treat HTTP methods inconsistently. A path that returns `403` on `GET` might return `200` on `POST`, `PUT` or an obscure WebDAV method. `hvt` fires every method you choose against a target and surfaces anything worth investigating.
+Some web servers and proxies treat HTTP methods inconsistently. A path that
+returns `403` on `GET` might return `200` on `POST`, `PUT` or an obscure
+WebDAV method. `hvt` fires every method you choose against a target and
+surfaces anything worth investigating.
 
 ## Install
 
@@ -43,16 +47,17 @@ nix develop        # dev shell
 
 ### Nixpkgs
 
-For Nix or NixOS users is a package available. Keep in mind that the latest releases might only
-be present in the ``unstable`` channel.
+For Nix or NixOS users is a package available. Keep in mind that the
+latest releases might only be present in the `unstable` channel.
 
 ```bash
- $ nix-env -iA nixos.hvt
+nix-env -iA nixos.hvt
 ```
 
 ## Testing
 
-Run the unit tests inside the Nix dev shell (provides `gcc` required by the `ring` dependency):
+Run the unit tests inside the Nix dev shell (provides `gcc` required
+by the `ring` dependency):
 
 ```sh
 nix develop
@@ -65,7 +70,8 @@ Or run them entirely through Nix without entering a shell:
 nix flake check
 ```
 
-`nix flake check` compiles the project with `gcc` available and executes `cargo test` in a sandboxed build environment.
+`nix flake check` compiles the project with `gcc` available and
+executes `cargo test` in a sandboxed build environment.
 
 ## Usage
 
@@ -76,7 +82,7 @@ hvt -u <URL> [OPTIONS]
 ### Options
 
 | Flag | Default | Description |
-|------|---------|-------------|
+| ---- | ------- | ----------- |
 | `-u, --url` | *(required)* | Target URL including scheme |
 | `-t, --threads` | `5` | Concurrent request threads |
 | `--all` | - | Test all 53 known methods (WebDAV, DeltaV, etc.) |
@@ -98,7 +104,7 @@ hvt -u <URL> [OPTIONS]
 ## Method sets
 
 | Flag | Methods |
-|------|---------|
+| ---- | ------- |
 | *(default)* | GET HEAD POST PUT DELETE CONNECT OPTIONS TRACE PATCH |
 | `--safe` | GET HEAD OPTIONS |
 | `--all` | 53 methods - common + WebDAV (PROPFIND, MKCOL, COPY, MOVE, LOCK...), DeltaV (CHECKOUT, CHECKIN, MERGE...), and others (PURGE, SEARCH, SUBSCRIBE, REBIND...) |
@@ -169,7 +175,8 @@ Summary
   2xx     : GET [200], HEAD [200], OPTIONS [200]
 ```
 
-Non-GET/HEAD methods that return 2xx or 3xx are flagged in the summary as potentially interesting.
+Non-GET/HEAD methods that return 2xx or 3xx are flagged in the summary as
+potentially interesting.
 
 ## License
 

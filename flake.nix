@@ -15,9 +15,8 @@
         pkgs = import nixpkgs { inherit system overlays; };
         rustToolchain = pkgs.rust-bin.stable.latest.default;
       in {
-        # `nix develop` - drop into dev shell
+        # nix develop - drop into dev shell
         devShells.default = pkgs.mkShell {
-          # rustls is pure Rust - no OpenSSL or pkg-config needed
           buildInputs = with pkgs; [
             rustToolchain
             gcc
@@ -25,13 +24,14 @@
           RUST_BACKTRACE = "1";
         };
 
-        # `nix build` - produce the binary
+        # nix build - produce the binary
         packages.default = pkgs.rustPlatform.buildRustPackage {
           pname = "hvt";
           version = "0.2.0";
           src = ./.;
           cargoLock.lockFile = ./Cargo.lock;
-          nativeBuildInputs = with pkgs; [ gcc ];
+          nativeBuildInputs = with pkgs; [ gcc pkg-config ];
+          buildInputs = with pkgs; [ aws-lc ];
           meta = with pkgs.lib; {
             description = "HTTP Verb Tampering - security testing tool";
             license = licenses.mit;
@@ -39,13 +39,14 @@
           };
         };
 
-        # `nix flake check` - build and run cargo test
+        # nix flake check - build and run cargo test
         checks.default = pkgs.rustPlatform.buildRustPackage {
           pname = "hvt";
           version = "0.2.0";
           src = ./.;
           cargoLock.lockFile = ./Cargo.lock;
-          nativeBuildInputs = with pkgs; [ gcc ];
+          nativeBuildInputs = with pkgs; [ gcc pkg-config ];
+          buildInputs = with pkgs; [ aws-lc ];
           doCheck = true;
         };
 
